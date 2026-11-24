@@ -65,6 +65,22 @@ extension Acoustics.Plate.System {
         let density: Double
         let q: (q11: Double, q12: Double, q22: Double, q66: Double)
         let s: (xz: Double, yz: Double)
+
+        init(_ material: Acoustics.Plate.Material, thickness h: Double) {
+            let ex = material.young.x.underlying
+            let ey = material.young.y.underlying
+            let nxy = material.poisson.underlying
+            let nyx = nxy * ey / ex
+            let denominator = 1 - nxy * nyx
+            self.density = material.density.underlying
+            self.q = (
+                q11: ex / denominator,
+                q12: nxy * ey / denominator,
+                q22: ey / denominator,
+                q66: material.shear.xy.underlying
+            )
+            self.s = (xz: 5.0 / 6 * h * material.shear.xz.underlying, yz: 5.0 / 6 * h * material.shear.yz.underlying)
+        }
     }
 
     init(_ plate: Acoustics.Plate) throws(Acoustics.Plate.Error) {
@@ -90,23 +106,7 @@ extension Acoustics.Plate.System {
         let unknowns = Galerkin.Unknowns(vertices: points.count, components: 3, held: held.fixed)
 
         let h = plate.thickness.underlying
-        func constants(_ material: Acoustics.Plate.Material) -> Constants {
-            let ex = material.young.x.underlying
-            let ey = material.young.y.underlying
-            let nxy = material.poisson.underlying
-            let nyx = nxy * ey / ex
-            let denominator = 1 - nxy * nyx
-            return Constants(
-                density: material.density.underlying,
-                q: (
-                    q11: ex / denominator,
-                    q12: nxy * ey / denominator,
-                    q22: ey / denominator,
-                    q66: material.shear.xy.underlying
-                ),
-                s: (xz: 5.0 / 6 * h * material.shear.xz.underlying, yz: 5.0 / 6 * h * material.shear.yz.underlying)
-            )
-        }
+        func constants(_ material: Acoustics.Plate.Material) -> Constants { Constants(material, thickness: h) }
         let common = constants(plate.material)
         let others = plate.materials.mapValues(constants)
 

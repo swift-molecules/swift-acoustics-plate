@@ -1,4 +1,6 @@
+public import Acoustics
 internal import Galerkin
+public import Mesh
 
 extension Acoustics.Plate {
     /// One quadrilateral of Reissner–Mindlin plate: deflection w and the rotations βx, βy of the normal at each
@@ -6,13 +8,36 @@ extension Acoustics.Plate {
     /// points; the transverse shear is MITC4's (Bathe and Dvorkin 1985), its covariant strains tied at the edges'
     /// midpoints so that the element does not lock when the plate is thin. The mass is consistent and includes the
     /// normal's rotary inertia ρh³/12.
-    internal struct Element {
+    ///
+    /// A shell made of flat facets uses it as each facet's bending, in the facet's own plane.
+    public struct Element {
         /// Corner coordinates, counterclockwise.
-        let corners: [Point<2, Double>]
+        public let corners: [Point<2, Double>]
 
-        init(_ corners: [Point<2, Double>]) {
+        /// The element over these four corners, counterclockwise.
+        public init(_ corners: [Point<2, Double>]) {
             self.corners = corners
         }
+    }
+}
+
+extension Acoustics.Plate.Element: Hashable {}
+extension Acoustics.Plate.Element: Sendable {}
+
+extension Acoustics.Plate.Element {
+    /// The 12 × 12 stiffness and mass matrices, row-major over (w, βx, βy) at each corner in turn, of this element
+    /// cut from a plate of `thickness` and `material`, the material's first axis along x.
+    public func matrices(
+        thickness: Measure<1, Space.Physical>.Value<Double>,
+        material: Acoustics.Plate.Material
+    ) -> (stiffness: [Double], mass: [Double]) {
+        let constants = Acoustics.Plate.System.Constants(material, thickness: thickness.underlying)
+        return matrices(
+            thickness: thickness.underlying,
+            density: constants.density,
+            q: constants.q,
+            s: constants.s
+        )
     }
 }
 
@@ -30,7 +55,7 @@ extension Acoustics.Plate.Element {
 
     /// The smallest Jacobian determinant over the Gauss points and the corners: positive for a counterclockwise
     /// convex quadrilateral.
-    var determinant: Double {
+    public var determinant: Double {
         var least = Double.infinity
         for point in Self.quadrature.points + Square.corners(Double.self) {
             least = Swift.min(least, map(point).jacobian.determinant)
