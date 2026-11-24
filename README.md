@@ -1,8 +1,6 @@
 # swift-acoustics-plate
 
-Use this package when a sound should come from a plate whose shape and wood you know: a soundboard, a guitar top, a panel. Give it a midsurface as a mesh of quadrilaterals, a thickness, a material and how the outline is held; `Acoustics.Plate.Modes` gives the lowest modes, each with its frequency, its shape at every vertex, its modal mass, the area it sweeps and how well it radiates. Compute them once and keep the value. A mode drives a resonance of swift-acoustics-resonator as a mass of `mass`, struck where the shape is s with a `reach` of s.
-
-The modes come from finite elements: Reissner–Mindlin plate quadrilaterals (MITC4) assembled into a sparse stiffness and mass of swift-sparse, whose lowest eigenpairs swift-eigen finds by shift-invert Lanczos. The radiation is the Rayleigh integral of each mode in an infinite rigid baffle. Woods come from the USDA Wood Handbook (2021).
+Use this package when a sound should come from a plate whose shape and wood you know: a soundboard, a guitar top, a panel. Give it a midsurface as a mesh of quadrilaterals, a thickness, a material and how the outline is held; `Acoustics.Plate.Modes` gives the lowest modes, each with its frequency, its shape at every vertex, its modal mass, the area it sweeps and how well it radiates. Compute them once and keep the value. A mode drives a resonance of swift-acoustics-resonator as a mass of `mass`, struck where the shape is s with a `reach` of s. The modes come from finite elements: Reissner–Mindlin plate quadrilaterals (MITC4) assembled into a sparse stiffness and mass of swift-sparse, whose lowest eigenpairs swift-eigen finds by shift-invert Lanczos. The radiation is the Rayleigh integral of each mode in an infinite rigid baffle. Woods come from the USDA Wood Handbook (2021).
 
 ## Laws
 
@@ -13,14 +11,8 @@ The modes come from finite elements: Reissner–Mindlin plate quadrilaterals (MI
 - **Modes.** The `count` lowest, ascending, a repeated frequency once per mode. A free plate's first three are its rigid motions, at zero to rounding. Each shape is the deflection at every vertex, held ones zero, scaled so that its largest value is 1. `mass` is the modal mass at that scale: the mode's kinetic energy is ½ mass × (velocity of its largest deflection)². Equal plates give equal modes; a plate scaled by s in every length rings at 1/s the frequency with s³ the mass.
 - **Radiation.** `area` is ∫ shape dA, the volume pushed out per metre of largest deflection: zero for a mode odd in either direction. `efficiency` is the power radiated through an infinite rigid baffle into `air` at the mode's own frequency, over ρ₀ c × area × the mean square velocity. Each face is a point source at its centroid of strength ∫ w dA, so faces must be small next to the wavelength.
 - **Woods.** `Material.Wood` holds the 2021 handbook's constants at 12% moisture content, each cited in the source to its table and page: E_L is Table 5–3a's bending modulus raised by 10%, as the handbook says, to remove shear deflection; E_R, E_T and the shear moduli are Table 5–1's ratios to it; μ_LR and μ_LT are Table 5–2's; the density is 1,000 kg m⁻³ × G₁₂ × 1.12 (Equation 4–14). A quartersawn board lies in the longitudinal–radial plane, a flatsawn one in the longitudinal–tangential plane. These are handbook means for clear wood; a chosen tonewood can differ by tens of percent.
-
-## Checked against
-
-- **Navier:** the thin simply supported square (with its repeated modes) within 1%, and the Mindlin–Navier frequencies of a quartersawn Sitka spruce panel, 0.40 × 0.25 m × 3 mm, within 1% over its first ten modes.
-- **Leissa (1969), Vibration of Plates, NASA SP-160:** the clamped circular plate (Table 2.1) within 1% over six modes, and the free square with ν = 0.3 (Table 4.65) within 0.5%.
-- **Radiation:** a disk moving as one against the baffled piston, 1 − J₁(2ka)/ka, within 1% from ka = 0.25 to 4; a simply supported panel's fundamental against Wallace's (1972) 32k²ab/π⁵ when ka ≪ 1, within 1%.
-- **Measured spruce boards** (Ducceschi, Duran, Tahvanainen and Ausiello 2024, Applied Acoustics 220, 109949), computed from the constants identified for them: a cantilever Finnish spruce board within 2.2% of its six measured frequencies, and a clamped Fiemme Valley red spruce guitar top within 1.6% of its six.
-
-## Not yet
-
-Triangles, curved shells, per-face thickness or grain, the enclosed air, wood losses and a mode's far-field directivity. General finite-element assembly belongs in a lower package: swift-institute/Issues#336.
+- **Checked against** closed forms and measurements:
+  - **Navier:** the thin simply supported square (with its repeated modes) within 1%, and the Mindlin–Navier frequencies of a quartersawn Sitka spruce panel, 0.40 × 0.25 m × 3 mm, within 1% over its first ten modes.
+  - **Leissa (1969), Vibration of Plates, NASA SP-160:** the clamped circular plate (Table 2.1) within 1% over six modes, and the free square with ν = 0.3 (Table 4.65) within 0.5%.
+  - **Radiation:** a disk moving as one against the baffled piston, 1 − J₁(2ka)/ka, within 1% from ka = 0.25 to 4; a simply supported panel's fundamental against Wallace's (1972) 32k²ab/π⁵ when ka ≪ 1, within 1%.
+  - **Measured spruce boards** (Ducceschi, Duran, Tahvanainen and Ausiello 2024, Applied Acoustics 220, 109949), computed from the constants identified for them: a cantilever Finnish spruce board within 2.2% of its six measured frequencies, and a clamped Fiemme Valley red spruce guitar top within 1.6% of its six.
