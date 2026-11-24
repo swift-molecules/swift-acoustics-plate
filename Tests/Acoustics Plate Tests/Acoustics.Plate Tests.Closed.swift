@@ -94,7 +94,7 @@ extension `Acoustics.Plate Tests`.Closed {
         let radius = 0.1
         let h = 0.001
         let plate = Acoustics.Plate(
-            mesh: `Acoustics.Plate Tests`.disk(radius: radius, cells: 16),
+            mesh: Mesh.disk(radius: radius, cells: 16),
             thickness: Space.Physical.metres(h),
             material: `Acoustics.Plate Tests`.aluminium,
             edge: .clamped

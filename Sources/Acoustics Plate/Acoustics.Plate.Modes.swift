@@ -77,7 +77,7 @@ extension Acoustics.Plate.System {
             faces.append(corners)
             elements.append(element)
         }
-        let held = Self.held(plate.edge, exceptions: plate.exceptions, points: points, faces: faces)
+        let held = Self.held(plate.edge, exceptions: plate.exceptions, points: points, outline: plate.mesh.outline)
 
         // Number the unknowns: deflection, then the two rotations in each vertex's frame.
         var unknown = [Int](repeating: -1, count: 3 * points.count)
@@ -160,38 +160,28 @@ extension Acoustics.Plate.System {
     /// Which of each vertex's unknowns the edge and its exceptions hold, and the tangent of the outline where only
     /// the rotation about the edge's normal is held.
     ///
-    /// The outline is the mesh's edges that only one face uses. For `.supported`, a vertex where the outline turns
-    /// by no more than 45° keeps its rotation about the outline, along the tangent that bisects its two edges; any
-    /// other vertex of the outline, such as a corner, has both rotations held.
+    /// The outline is the mesh's `outline`, the edges that only one face uses. For `.supported`, a vertex where the
+    /// outline turns by no more than 45° keeps its rotation about the outline, along the tangent that bisects its two
+    /// edges; any other vertex of the outline, such as a corner, has both rotations held.
     @usableFromInline
     static func held(
         _ edge: Acoustics.Plate.Edge,
         exceptions: [Int: Acoustics.Plate.Edge],
         points: [Point<2, Double>],
-        faces: [[Int]]
+        outline: [Segment<Index<Point<2, Double>>>]
     ) -> (fixed: [Set<Int>], tangent: [(x: Double, y: Double)?]) {
         var fixed = [Set<Int>](repeating: [], count: points.count)
         var tangent = [(x: Double, y: Double)?](repeating: nil, count: points.count)
         guard edge != .free || exceptions.values.contains(where: { $0 != .free }) else { return (fixed, tangent) }
-        var uses: [Int: Int] = [:]
-        func key(_ a: Int, _ b: Int) -> Int { Swift.min(a, b) * points.count + Swift.max(a, b) }
-        for corners in faces {
-            for i in 0..<corners.count {
-                uses[key(corners[i], corners[(i + 1) % corners.count]), default: 0] += 1
-            }
-        }
         var directions = [[(x: Double, y: Double)]](repeating: [], count: points.count)
-        for corners in faces {
-            for i in 0..<corners.count {
-                let a = corners[i]
-                let b = corners[(i + 1) % corners.count]
-                guard uses[key(a, b)] == 1 else { continue }
-                let dx = points[b].x - points[a].x
-                let dy = points[b].y - points[a].y
-                let length = (dx * dx + dy * dy).squareRoot()
-                directions[a].append((dx / length, dy / length))
-                directions[b].append((dx / length, dy / length))
-            }
+        for segment in outline {
+            let a = Int(bitPattern: segment.start)
+            let b = Int(bitPattern: segment.end)
+            let dx = points[b].x - points[a].x
+            let dy = points[b].y - points[a].y
+            let length = (dx * dx + dy * dy).squareRoot()
+            directions[a].append((dx / length, dy / length))
+            directions[b].append((dx / length, dy / length))
         }
         let straight = 0.5.squareRoot()
         for vertex in points.indices where !directions[vertex].isEmpty {

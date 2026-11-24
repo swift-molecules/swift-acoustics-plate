@@ -14,7 +14,7 @@ extension `Acoustics.Plate Tests`.Radiation {
     func `A disk moving as one radiates as a baffled piston, 1 − J₁(2ka) / ka`(ka: Double) throws {
         let radius = 0.1
         let plate = Acoustics.Plate(
-            mesh: `Acoustics.Plate Tests`.disk(radius: radius, cells: 12),
+            mesh: Mesh.disk(radius: radius, cells: 12),
             thickness: Space.Physical.metres(0.001),
             material: `Acoustics.Plate Tests`.aluminium,
             edge: .free
