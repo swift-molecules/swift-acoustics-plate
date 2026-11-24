@@ -1,0 +1,8 @@
+description: "Plates for Swift: the modes, mode shapes and radiation of a plate from its shape and material, by finite elements."
+topics:
+  - acoustics
+  - physical-modelling
+  - finite-elements
+homepage: "https://swift-institute.org"
+readme:
+  family: E
