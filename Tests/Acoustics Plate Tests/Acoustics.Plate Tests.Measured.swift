@@ -20,7 +20,10 @@ extension `Acoustics.Plate Tests`.Measured {
             density: Density.amount(density),
             young: .init(x: Modulus.Young.pascals(x), y: Modulus.Young.pascals(y)),
             shear: .init(
-                xy: Modulus.Shear.pascals(shear), xz: Modulus.Shear.pascals(0.62e9), yz: Modulus.Shear.pascals(0.023e9)),
+                xy: Modulus.Shear.pascals(shear),
+                xz: Modulus.Shear.pascals(0.62e9),
+                yz: Modulus.Shear.pascals(0.023e9)
+            ),
             poisson: Poisson.amount(0.51)
         )
     }

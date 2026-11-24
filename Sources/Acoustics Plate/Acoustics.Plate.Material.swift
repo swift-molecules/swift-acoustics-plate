@@ -101,8 +101,10 @@ extension Acoustics.Plate.Material {
                 density: wood.density,
                 young: Young(x: wood.young.longitudinal, y: wood.young.radial),
                 shear: Shear(
-                    xy: wood.shear.longitudinalRadial, xz: wood.shear.longitudinalTangential,
-                    yz: wood.shear.radialTangential),
+                    xy: wood.shear.longitudinalRadial,
+                    xz: wood.shear.longitudinalTangential,
+                    yz: wood.shear.radialTangential
+                ),
                 poisson: wood.poisson.longitudinalRadial
             )
         case .flat:
@@ -110,8 +112,10 @@ extension Acoustics.Plate.Material {
                 density: wood.density,
                 young: Young(x: wood.young.longitudinal, y: wood.young.tangential),
                 shear: Shear(
-                    xy: wood.shear.longitudinalTangential, xz: wood.shear.longitudinalRadial,
-                    yz: wood.shear.radialTangential),
+                    xy: wood.shear.longitudinalTangential,
+                    xz: wood.shear.longitudinalRadial,
+                    yz: wood.shear.radialTangential
+                ),
                 poisson: wood.poisson.longitudinalTangential
             )
         }

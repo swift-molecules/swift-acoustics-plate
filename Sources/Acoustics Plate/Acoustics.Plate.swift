@@ -1,5 +1,4 @@
 public import Acoustics
-public import Density
 public import Mesh
 
 extension Acoustics {
