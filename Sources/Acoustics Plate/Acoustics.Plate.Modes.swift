@@ -60,6 +60,13 @@ extension Acoustics.Plate {
 }
 
 extension Acoustics.Plate.System {
+    /// A material's density, its bending constants Q and its shear stiffnesses κ h G.
+    struct Constants {
+        let density: Double
+        let q: (q11: Double, q12: Double, q22: Double, q66: Double)
+        let s: (xz: Double, yz: Double)
+    }
+
     init(_ plate: Acoustics.Plate) throws(Acoustics.Plate.Error) {
         let points = plate.mesh.vertices
         var faces: [[Int]] = []
@@ -76,27 +83,38 @@ extension Acoustics.Plate.System {
             faces.append(corners)
             elements.append(element)
         }
+        if let stray = plate.materials.keys.first(where: { !faces.indices.contains($0) }) { throw .face(stray) }
         let held = Self.held(plate.edge, exceptions: plate.exceptions, points: points, outline: plate.mesh.outline)
 
         // The unknowns: deflection, then the two rotations in each vertex's frame.
         let unknowns = Galerkin.Unknowns(vertices: points.count, components: 3, held: held.fixed)
 
-        let material = plate.material
-        let ex = material.young.x.underlying
-        let ey = material.young.y.underlying
-        let nxy = material.poisson.underlying
-        let nyx = nxy * ey / ex
-        let denominator = 1 - nxy * nyx
-        let q = (
-            q11: ex / denominator, q12: nxy * ey / denominator, q22: ey / denominator, q66: material.shear.xy.underlying
-        )
         let h = plate.thickness.underlying
-        let s = (xz: 5.0 / 6 * h * material.shear.xz.underlying, yz: 5.0 / 6 * h * material.shear.yz.underlying)
+        func constants(_ material: Acoustics.Plate.Material) -> Constants {
+            let ex = material.young.x.underlying
+            let ey = material.young.y.underlying
+            let nxy = material.poisson.underlying
+            let nyx = nxy * ey / ex
+            let denominator = 1 - nxy * nyx
+            return Constants(
+                density: material.density.underlying,
+                q: (
+                    q11: ex / denominator,
+                    q12: nxy * ey / denominator,
+                    q22: ey / denominator,
+                    q66: material.shear.xy.underlying
+                ),
+                s: (xz: 5.0 / 6 * h * material.shear.xz.underlying, yz: 5.0 / 6 * h * material.shear.yz.underlying)
+            )
+        }
+        let common = constants(plate.material)
+        let others = plate.materials.mapValues(constants)
 
         var stiffness = Galerkin.Assembly(unknowns, rotations: held.rotations)
         var mass = stiffness
-        for (corners, element) in zip(faces, elements) {
-            let (k, m) = element.matrices(thickness: h, density: material.density.underlying, q: q, s: s)
+        for (index, (corners, element)) in zip(faces, elements).enumerated() {
+            let c = others[index] ?? common
+            let (k, m) = element.matrices(thickness: h, density: c.density, q: c.q, s: c.s)
             stiffness.add(k, at: corners)
             mass.add(m, at: corners)
         }

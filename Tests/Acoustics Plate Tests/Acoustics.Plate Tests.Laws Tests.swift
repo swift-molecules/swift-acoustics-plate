@@ -55,6 +55,34 @@ extension `Acoustics.Plate Tests`.Laws {
     }
 
     @Test
+    func `A material given face by face acts where it is given and nowhere else`() throws {
+        let walnut = Acoustics.Plate.Material(.blackWalnut, cut: .quarter)
+        let faces = Self.panel.mesh.faces.indices
+        var everywhere = Self.panel
+        everywhere.materials = Dictionary(uniqueKeysWithValues: faces.map { ($0, walnut) })
+        var uniform = Self.panel
+        uniform.material = walnut
+        #expect(
+            try Acoustics.Plate.Modes(everywhere, count: 4).map(\.frequency)
+                == Acoustics.Plate.Modes(uniform, count: 4).map(\.frequency)
+        )
+        // Stiffer cross-grain faces in a band across the middle raise every mode, and only a little.
+        var stiff = Self.panel.material
+        stiff.young.y = Modulus.Young.amount(10 * stiff.young.y.underlying)
+        var banded = Self.panel
+        for (index, face) in Self.panel.mesh.faces.enumerated() {
+            let x = face.vertices.map { Self.panel.mesh.vertices[Int(bitPattern: $0)].x }.reduce(0, +) / 4
+            if abs(x - 0.2) < 0.02 { banded.materials[index] = stiff }
+        }
+        let plain = try Acoustics.Plate.Modes(Self.panel, count: 4)
+        let barred = try Acoustics.Plate.Modes(banded, count: 4)
+        for (p, b) in zip(plain, barred) { #expect(b.frequency.underlying > p.frequency.underlying) }
+        var stray = Self.panel
+        stray.materials = [faces.count: walnut]
+        #expect(throws: Acoustics.Plate.Error.face(faces.count)) { try Acoustics.Plate.Modes(stray, count: 1) }
+    }
+
+    @Test
     func `Faces listed clockwise give the same modes as counterclockwise`() throws {
         let reversed = Acoustics.Plate(
             mesh: Self.panel.mesh.reversed,

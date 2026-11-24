@@ -13,6 +13,9 @@ extension Acoustics {
         public var thickness: Measure<1, Space.Physical>.Value<Double>
         /// The material, its first axis along x.
         public var material: Material
+        /// The faces made of something other than `material`, by their index in the mesh's faces: a bar or a brace
+        /// smeared over the faces it crosses, or a patch of other wood.
+        public var materials: [Int: Material]
         /// How the outline is held.
         public var edge: Edge
         /// The vertices of the outline held otherwise than `edge`, by their index in the mesh's vertices: a
@@ -24,12 +27,14 @@ extension Acoustics {
             mesh: Mesh<Point<2, Double>>,
             thickness: Measure<1, Space.Physical>.Value<Double>,
             material: Material,
+            materials: [Int: Material] = [:],
             edge: Edge,
             exceptions: [Int: Edge] = [:]
         ) {
             self.mesh = mesh
             self.thickness = thickness
             self.material = material
+            self.materials = materials
             self.edge = edge
             self.exceptions = exceptions
         }
