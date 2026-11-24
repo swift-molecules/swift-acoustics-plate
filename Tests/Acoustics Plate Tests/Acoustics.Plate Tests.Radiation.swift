@@ -1,7 +1,8 @@
-@testable import Acoustics_Plate
 import Bessel
 import Numeric
 import Testing
+
+@testable import Acoustics_Plate
 
 extension `Acoustics.Plate Tests` {
     /// Radiation into a half-space through an infinite rigid baffle, against closed forms.
@@ -22,7 +23,8 @@ extension `Acoustics.Plate Tests`.Radiation {
         let shape = [Double](repeating: 1, count: plate.mesh.vertices.count)
         let found = system.radiation(shape, wavenumber: ka / radius)
         let exact = 1 - 2 * Bessel.First<Double>(order: 1).value(at: 2 * ka) / (2 * ka)
-        #expect(abs(found.efficiency - exact) < 0.01 * Swift.max(exact, 0.1), "found \(found.efficiency), piston \(exact)")
+        #expect(
+            abs(found.efficiency - exact) < 0.01 * Swift.max(exact, 0.1), "found \(found.efficiency), piston \(exact)")
         // The mesh's outline is a polygon inside the circle.
         #expect(abs(found.area - Double.pi * radius * radius) < 0.005 * Double.pi * radius * radius)
     }

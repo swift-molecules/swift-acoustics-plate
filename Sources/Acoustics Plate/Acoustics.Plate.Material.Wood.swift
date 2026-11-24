@@ -73,7 +73,9 @@ extension Acoustics.Plate.Material.Wood {
         public var longitudinalTangential: Poisson::Poisson.Value<Double>
 
         @inlinable
-        public init(longitudinalRadial: Poisson::Poisson.Value<Double>, longitudinalTangential: Poisson::Poisson.Value<Double>) {
+        public init(
+            longitudinalRadial: Poisson::Poisson.Value<Double>, longitudinalTangential: Poisson::Poisson.Value<Double>
+        ) {
             self.longitudinalRadial = longitudinalRadial
             self.longitudinalTangential = longitudinalTangential
         }

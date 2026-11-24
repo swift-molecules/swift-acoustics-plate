@@ -1,5 +1,6 @@
-@testable import Acoustics_Plate
 import Testing
+
+@testable import Acoustics_Plate
 
 extension `Acoustics.Plate Tests` {
     /// What holds for every plate.
@@ -116,7 +117,9 @@ extension `Acoustics.Plate Tests` {
 
 extension `Acoustics.Plate Tests`.Wood {
     @Test
-    func `Sitka spruce: E_L is Table 5–3a's 10,800 MPa raised 10%, the rest Table 5–1's ratios, density from G₁₂ = 0.40`() {
+    func
+        `Sitka spruce: E_L is Table 5–3a's 10,800 MPa raised 10%, the rest Table 5–1's ratios, density from G₁₂ = 0.40`()
+    {
         let wood = Acoustics.Plate.Material.Wood.sitkaSpruce
         let e = 11_880e6
         #expect(abs(wood.young.longitudinal.underlying - e) < 1)

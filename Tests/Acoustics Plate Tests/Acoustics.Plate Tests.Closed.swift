@@ -1,5 +1,6 @@
-@testable import Acoustics_Plate
 import Testing
+
+@testable import Acoustics_Plate
 
 extension `Acoustics.Plate Tests` {
     /// Plates whose modes are known in closed form.

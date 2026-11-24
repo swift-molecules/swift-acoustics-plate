@@ -77,7 +77,7 @@ extension Acoustics.Plate.System {
             faces.append(corners)
             elements.append(element)
         }
-        let held = Self.held(plate.edge, points: points, faces: faces)
+        let held = Self.held(plate.edge, exceptions: plate.exceptions, points: points, faces: faces)
 
         // Number the unknowns: deflection, then the two rotations in each vertex's frame.
         var unknown = [Int](repeating: -1, count: 3 * points.count)
@@ -95,7 +95,9 @@ extension Acoustics.Plate.System {
         let nxy = material.poisson.underlying
         let nyx = nxy * ey / ex
         let denominator = 1 - nxy * nyx
-        let q = (q11: ex / denominator, q12: nxy * ey / denominator, q22: ey / denominator, q66: material.shear.xy.underlying)
+        let q = (
+            q11: ex / denominator, q12: nxy * ey / denominator, q22: ey / denominator, q66: material.shear.xy.underlying
+        )
         let h = plate.thickness.underlying
         let s = (xz: 5.0 / 6 * h * material.shear.xz.underlying, yz: 5.0 / 6 * h * material.shear.yz.underlying)
 
@@ -155,8 +157,8 @@ extension Acoustics.Plate.System {
         }
     }
 
-    /// Which of each vertex's unknowns the edge holds, and the tangent of the outline where only the rotation about
-    /// the edge's normal is held.
+    /// Which of each vertex's unknowns the edge and its exceptions hold, and the tangent of the outline where only
+    /// the rotation about the edge's normal is held.
     ///
     /// The outline is the mesh's edges that only one face uses. For `.supported`, a vertex where the outline turns
     /// by no more than 45° keeps its rotation about the outline, along the tangent that bisects its two edges; any
@@ -164,12 +166,13 @@ extension Acoustics.Plate.System {
     @usableFromInline
     static func held(
         _ edge: Acoustics.Plate.Edge,
+        exceptions: [Int: Acoustics.Plate.Edge],
         points: [Point<2, Double>],
         faces: [[Int]]
     ) -> (fixed: [Set<Int>], tangent: [(x: Double, y: Double)?]) {
         var fixed = [Set<Int>](repeating: [], count: points.count)
         var tangent = [(x: Double, y: Double)?](repeating: nil, count: points.count)
-        guard edge != .free else { return (fixed, tangent) }
+        guard edge != .free || exceptions.values.contains(where: { $0 != .free }) else { return (fixed, tangent) }
         var uses: [Int: Int] = [:]
         func key(_ a: Int, _ b: Int) -> Int { Swift.min(a, b) * points.count + Swift.max(a, b) }
         for corners in faces {
@@ -192,7 +195,7 @@ extension Acoustics.Plate.System {
         }
         let straight = 0.5.squareRoot()
         for vertex in points.indices where !directions[vertex].isEmpty {
-            switch edge {
+            switch exceptions[vertex] ?? edge {
             case .free:
                 break
             case .pinned:

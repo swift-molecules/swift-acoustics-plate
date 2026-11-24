@@ -1,5 +1,6 @@
-@testable import Acoustics_Plate
 import Testing
+
+@testable import Acoustics_Plate
 
 @Suite struct `Acoustics.Plate Tests` {}
 
