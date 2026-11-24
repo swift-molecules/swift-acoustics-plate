@@ -23,4 +23,4 @@ The modes come from finite elements: Reissner–Mindlin plate quadrilaterals (MI
 
 ## Not yet
 
-Triangles, curved shells, per-face thickness or grain, the enclosed air, wood losses and a mode's far-field directivity. Mesh generation for arbitrary outlines and general finite-element assembly belong in lower packages and are filed in swift-institute/Issues.
+Triangles, curved shells, per-face thickness or grain, the enclosed air, wood losses and a mode's far-field directivity. Mesh generation for arbitrary outlines and general finite-element assembly belong in lower packages: swift-institute/Issues#336 and #337.
