@@ -23,7 +23,7 @@ let package = Package(
         .package(url: "https://github.com/swift-atoms/swift-numeric.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-density.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-modulus.git", branch: "main"),
-        .package(url: "https://github.com/swift-atoms/swift-poisson.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-strain.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-frequency.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-bessel.git", branch: "main"),
     ],
@@ -39,7 +39,7 @@ let package = Package(
                 .product(name: "Numeric", package: "swift-numeric"),
                 .product(name: "Density", package: "swift-density"),
                 .product(name: "Modulus", package: "swift-modulus"),
-                .product(name: "Poisson", package: "swift-poisson"),
+                .product(name: "Strain", package: "swift-strain"),
                 .product(name: "Frequency", package: "swift-frequency"),
             ]
         ),

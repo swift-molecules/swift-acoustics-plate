@@ -4,4 +4,4 @@
 @_exported public import Frequency
 @_exported public import Mesh
 @_exported public import Modulus
-@_exported public import Poisson
+@_exported public import Strain

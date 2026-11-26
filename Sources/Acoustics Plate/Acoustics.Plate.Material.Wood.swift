@@ -1,6 +1,6 @@
 public import Density
 public import Modulus
-public import Poisson
+public import Strain
 
 extension Acoustics.Plate.Material {
     /// The elastic constants of a clear wood at 12% moisture content along its three axes: longitudinal (along the
@@ -69,13 +69,13 @@ extension Acoustics.Plate.Material.Wood {
     }
 
     public struct Poisson: Hashable, Sendable {
-        public var longitudinalRadial: Poisson::Poisson.Value<Double>
-        public var longitudinalTangential: Poisson::Poisson.Value<Double>
+        public var longitudinalRadial: Strain.Ratio.Value<Double>
+        public var longitudinalTangential: Strain.Ratio.Value<Double>
 
         @inlinable
         public init(
-            longitudinalRadial: Poisson::Poisson.Value<Double>,
-            longitudinalTangential: Poisson::Poisson.Value<Double>
+            longitudinalRadial: Strain.Ratio.Value<Double>,
+            longitudinalTangential: Strain.Ratio.Value<Double>
         ) {
             self.longitudinalRadial = longitudinalRadial
             self.longitudinalTangential = longitudinalTangential
@@ -114,8 +114,8 @@ extension Acoustics.Plate.Material.Wood {
                 radialTangential: Modulus.Shear.pascals(longitudinal * ratios.rt)
             ),
             poisson: Poisson(
-                longitudinalRadial: Poisson::Poisson.amount(poisson.lr),
-                longitudinalTangential: Poisson::Poisson.amount(poisson.lt)
+                longitudinalRadial: Strain.Ratio.amount(poisson.lr),
+                longitudinalTangential: Strain.Ratio.amount(poisson.lt)
             )
         )
     }

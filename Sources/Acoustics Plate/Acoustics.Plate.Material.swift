@@ -1,6 +1,6 @@
 public import Density
 public import Modulus
-public import Poisson
+public import Strain
 
 extension Acoustics.Plate {
     /// An orthotropic material whose axes of symmetry are the plate's: x and y in its plane, z through its thickness.
@@ -15,14 +15,14 @@ extension Acoustics.Plate {
         /// The shear moduli in the x–y, x–z and y–z planes.
         public var shear: Shear
         /// Poisson's ratio ν_xy: the narrowing along y per stretch along x. ν_yx follows as ν_xy E_y / E_x.
-        public var poisson: Poisson.Value<Double>
+        public var poisson: Strain.Ratio.Value<Double>
 
         @inlinable
         public init(
             density: Density.Value<Double>,
             young: Young,
             shear: Shear,
-            poisson: Poisson.Value<Double>
+            poisson: Strain.Ratio.Value<Double>
         ) {
             self.density = density
             self.young = young
@@ -76,7 +76,7 @@ extension Acoustics.Plate.Material {
     public static func isotropic(
         density: Density.Value<Double>,
         young: Modulus.Young.Value<Double>,
-        poisson: Poisson.Value<Double>
+        poisson: Strain.Ratio.Value<Double>
     ) -> Self {
         let shear = Modulus.Shear.pascals(young.underlying / (2 * (1 + poisson.underlying)))
         return Self(

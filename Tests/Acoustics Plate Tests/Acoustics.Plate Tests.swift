@@ -18,7 +18,7 @@ extension `Acoustics.Plate Tests` {
     static let aluminium = Acoustics.Plate.Material.isotropic(
         density: Density.amount(2_700),
         young: Modulus.Young.pascals(70e9),
-        poisson: Poisson.amount(0.3)
+        poisson: Strain.Ratio.amount(0.3)
     )
 
     /// √(D / ρh) for an isotropic plate of this material and thickness.

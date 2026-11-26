@@ -24,7 +24,7 @@ extension `Acoustics.Plate Tests`.Measured {
                 xz: Modulus.Shear.pascals(0.62e9),
                 yz: Modulus.Shear.pascals(0.023e9)
             ),
-            poisson: Poisson.amount(0.51)
+            poisson: Strain.Ratio.amount(0.51)
         )
     }
 
